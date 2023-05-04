@@ -58,8 +58,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::ListPositions {} => {
             let positions = POSITIONS.load(deps.storage)?;
-            // TODO return positions in binary. Position is already serializable 
-            to_binary(&positions);
+            to_binary(&positions)
         }
     }
 }

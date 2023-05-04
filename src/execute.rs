@@ -66,15 +66,20 @@ pub fn send_back_to_peggy(deps:DepsMut, env: Env, position: Position) -> StdResu
     // use peggy sendtoethereum send this message https://docs.injective.network/develop/modules/Injective/peggy/messages? 
     let config = CONFIG.load(deps.storage)?;
 
+    let uint128_loan_value = match Uint128::try_from(position.loan_value) {
+        Ok(value) => value,
+        Err(_) => panic!("Conversion overflowed, the Uint256 value is too large for Uint128"),
+    };
+
     let send_to_eth_msg = MsgSendToEth {
         sender: env.contract.address.to_string(),
         eth_dest: position.borrower_address.to_string(),
         amount: Coin {
-            denom: "weth".to_string(),
-            amount: position.loan_value, // TODO WILL THIS BE A PROBLEM? amount is Uint128...
+            denom: "peggy0x91Efc46E7C52ab1fFca310Ca7972AeA48891E5CD".to_string(),
+            amount: uint128_loan_value, // TODO THIS WILL BE A PROBLEM, amount is Uint128...
         },
         bridge_fees: Coin {
-            denom: "weth".to_string(),
+            denom: "peggy0x91Efc46E7C52ab1fFca310Ca7972AeA48891E5CD".to_string(),
             amount: Uint128::from(0 as u32) ,
         },
     };
